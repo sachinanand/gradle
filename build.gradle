@@ -1,0 +1,53 @@
+apply plugin:'java'
+apply plugin:'groovy'
+apply plugin:'idea'
+task hello {
+println "hello";
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'http://download.java.net/maven/1' }
+    maven { url 'http://download.java.net/maven/2' }
+}
+
+
+
+sourceSets {
+   main {
+      java.srcDirs = ['src/java', "${buildDir}/generated"]
+      groovy.srcDirs=['src/groovy']
+      resources.srcDirs = ['src/resources']
+     }
+   test {
+      java.srcDirs = ['test/java']
+      groovy.srcDirs = ['test/groovy']
+     }
+}
+
+configurations {
+    jaxws
+}
+
+task wsimport {
+    doLast {
+        destDir = file("${buildDir}/generated")
+        ant {
+            sourceSets.main.output.classesDir.mkdirs()
+            destDir.mkdirs()
+            taskdef(name:'wsimport',
+                    classname:'com.sun.tools.ws.ant.WsImport',
+                    classpath:configurations.jaxws.asPath)
+            wsimport(keep:true,
+                    destdir: sourceSets.main.output.classesDir,
+                    sourcedestdir: destDir,
+                    wsdl:'http://www.webservicex.net/CurrencyConvertor.asmx?wsdl')
+        }
+    }
+}
+compileJava.dependsOn(wsimport)
+
+dependencies {
+    groovy group:'org.codehaus.groovy', name:'groovy-all', version:'1.8.4'
+    jaxws 'com.sun.xml.ws:jaxws-tools:2.1.4'
+}
