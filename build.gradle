@@ -1,5 +1,5 @@
 apply plugin:'java'
-apply plugin:'groovy'
+apply plugin:   'groovy'
 apply plugin:'idea'
 
 task hello {
@@ -13,17 +13,17 @@ repositories {
 }
 
 
-
 sourceSets {
-   main {
-      java.srcDirs = ['src/java', "${buildDir}/generated"]
-      groovy.srcDirs=['src/groovy']
-      resources.srcDirs = ['src/resources']
-     }
-   test {
-      java.srcDirs = ['test/java']
-      groovy.srcDirs = ['test/groovy']
-     }
+    main {
+        java { srcDir "$buildDir/generated" }
+        groovy { srcDir 'src/groovy' }
+    }
+    test {
+        java { srcDirs = ['test/java'] }
+        groovy { srcDir 'test/groovy' }
+        resources { srcDir 'resources' }
+    }
+
 }
 
 configurations {
@@ -45,12 +45,32 @@ task wsimport {
                     wsdl:'http://www.webservicex.net/CurrencyConvertor.asmx?wsdl')
         }
     }
+
+
 }
 compileJava.dependsOn(wsimport)
 
-dependencies {
-    groovy group:'org.codehaus.groovy', name:'groovy-all', version:'1.8.4'
-    jaxws 'com.sun.xml.ws:jaxws-tools:2.1.4'
+jar {
 
+    doFirst {
+        from (configurations.runtime.resolve().collect { it.isDirectory() ? it : zipTree(it) }) {
+            exclude 'META-INF/MANIFEST.MF'
+            exclude 'META-INF/*.SF'
+            exclude 'META-INF/*.DSA'
+            exclude 'META-INF/*.RSA'
+        }
+    }
+
+
+    manifest {
+        attributes("Main-Class": "com.ig.Hello")
+
+    }
+    dependsOn javadoc
+}
+
+dependencies {
+    groovy group:'org.codehaus.groovy', name:'groovy-all', version:'1.8.8'
+    jaxws 'com.sun.xml.ws:jaxws-tools:2.1.4'
     testCompile 'org.spockframework:spock-core:0.5-groovy-1.8'
 }
