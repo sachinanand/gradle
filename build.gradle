@@ -1,6 +1,7 @@
 apply plugin:'java'
 apply plugin:'groovy'
 apply plugin:'idea'
+
 task hello {
 println "hello";
 }
@@ -50,4 +51,6 @@ compileJava.dependsOn(wsimport)
 dependencies {
     groovy group:'org.codehaus.groovy', name:'groovy-all', version:'1.8.4'
     jaxws 'com.sun.xml.ws:jaxws-tools:2.1.4'
+
+    testCompile 'org.spockframework:spock-core:0.5-groovy-1.8'
 }
