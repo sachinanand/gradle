@@ -2,6 +2,24 @@ apply plugin:'java'
 apply plugin:   'groovy'
 apply plugin:'idea'
 
+buildscript {
+    repositories {
+
+        maven {
+            url uri('../custom-plugin/repo')
+        }
+    }
+    dependencies {
+        classpath group: 'com.ig', 
+                  name: 'myplugin', 
+                  version: '0.1'
+    }
+}
+
+
+apply plugin : 'myplugin'
+
+
 task hello {
 println "hello";
 }
